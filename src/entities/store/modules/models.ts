@@ -2,30 +2,30 @@ import { Module } from "vuex";
 import { RootStore } from "..";
 import { httpRequest } from "@/libs";
 
-export interface iPersonalStore {
-  list: Personal.Person[]
+export interface iModelsStore {
+  list: iModels.Model[]
 }
 
-export const personal: Module<iPersonalStore, RootStore> = {
+export const models: Module<iModelsStore, RootStore> = {
   namespaced: true,
   state: {
     list: []
   },
   mutations: {
-    SET_LIST(state, payload: Personal.Person[]) {
+    SET_LIST(state, payload: iModels.Model[]) {
       state.list = payload
     },
-    ADD_PERSON(state, payload: Personal.Person) {
+    ADD_MODEL(state, payload: iModels.Model) {
       state.list.push(payload)
     },
-    DELETE_PERSON(state, payload: { id: number }) {
+    DELETE_MODEL(state, payload: { id: number }) {
       state.list = state.list.filter(p => p.id !== payload.id)
     }
   },
   actions: {
-    GET_PERSON_LIST({ commit }) {
+    GET_MODEL_LIST({ commit }) {
       return new Promise((resolve, reject) => {
-        httpRequest("/personal", "GET")
+        httpRequest("/models", "GET")
           .then((response) => {
             commit("SET_LIST", response)
             return resolve(response)
@@ -33,26 +33,26 @@ export const personal: Module<iPersonalStore, RootStore> = {
           .catch(error => reject(error))
       })
     },
-    GET_PERSON_BY_ID({ }, id: number): Promise<Personal.Person> {
+    GET_MODEL_BY_ID({ }, id: number): Promise<iModels.Model> {
       return new Promise((resolve, reject) => {
-        httpRequest<Personal.Person>(`/personal?${new URLSearchParams({ id: id.toString() })}`, "GET")
+        httpRequest<iModels.Model>(`/models?${new URLSearchParams({ id: id.toString() })}`, "GET")
           .then((response) => resolve(response))
           .catch(error => reject(error))
       })
     },
-    CREATE_PERSON({ commit, state }, payload: Personal.Person) {
+    CREATE_MODEL({ commit, state }, payload: iModels.Model) {
       return new Promise((resolve, reject) => {
-        httpRequest<Personal.Person>("/personal", "POST", payload)
+        httpRequest<iModels.Model>("/models", "POST", payload)
           .then((response) => {
-            commit("ADD_PERSON", response)
+            commit("ADD_MODEL", response)
             return resolve(state.list.find(p => p.id === response.id))
           })
           .catch(error => reject(error))
       })
     },
-    UPDATE_PERSON({ commit }, payload: { id: number } & Partial<Personal.Person>) {
+    UPDATE_MODEL({ commit }, payload: { id: number } & Partial<iModels.Model>) {
       return new Promise((resolve, reject) => {
-        httpRequest("/personal", "PUT", payload)
+        httpRequest("/models", "PUT", payload)
           .then((response) => {
             commit("ADD_EQUIPMENT", response)
             return resolve(response)
@@ -60,11 +60,11 @@ export const personal: Module<iPersonalStore, RootStore> = {
           .catch(error => reject(error))
       })
     },
-    DELETE_PERSON({ commit }, payload: { id: number }) {
+    DELETE_MODEL({ commit }, payload: { id: number }) {
       return new Promise((resolve, reject) => {
-        httpRequest("/personal", "DELETE", payload)
+        httpRequest("/models", "DELETE", payload)
           .then((response) => {
-            commit("DELETE_EQUIPMENT", response)
+            commit("DELETE_MODEL", response)
             return resolve(response)
           })
           .catch(error => reject(error))

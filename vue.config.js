@@ -7,6 +7,13 @@ module.exports = defineConfig({
   devServer: {
     allowedHosts: ['ui.equipment.local']
   },
+  css: {
+    loaderOptions: {
+      scss: {
+        additionalData: `@import "@/share/assets/css";`
+      }
+    }
+  },
   configureWebpack: {
     plugins: [
       new webpack.DefinePlugin({

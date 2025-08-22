@@ -9,6 +9,7 @@ declare global {
     }
 
     interface Equipment {
+      id: number
       model: number,
       person: number,
       cabinet: number,
@@ -28,10 +29,40 @@ declare global {
       firstName: string
       lastName: string
       surName: string | null
+      position: string | null
+      fullName: string
+      shortName: string
     }
   }
   namespace Cabinets {
-    interface Cabinet { }
+    interface Cabinet {
+      id: number,
+      number: number,
+      responsible?: Personal.Person
+    }
+  }
+  namespace Messages {
+    interface Message {
+      message: string,
+      type: "error" | "warn" | "info"
+      timestamp: number
+      hold: boolean
+      uid: string
+    }
+  }
+
+  namespace iModels {
+    interface Model {
+      id: number,
+      name: string,
+      brand?: number
+    }
+  }
+  namespace Brands {
+    interface Brand {
+      id: number,
+      name: string,
+    }
   }
 }
 

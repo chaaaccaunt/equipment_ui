@@ -4,6 +4,6 @@ export { }
 declare module 'vue-router' {
   interface RouteMeta {
     auth: boolean
-    layout: string
+    layout: "main" | "auth"
   }
 }
