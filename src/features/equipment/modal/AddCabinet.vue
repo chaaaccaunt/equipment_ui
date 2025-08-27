@@ -67,7 +67,8 @@ function close() {
         </label>
       </p>
       <p>
-        <select v-model="payload.responsibleId">
+        <label for="cab_resp">Ответственный в кабинете</label>
+        <select v-model="payload.responsibleId" id="cab_resp">
           <option :value="null" disabled>Выберите сотрудника</option>
           <option v-for="p in personalList" :key="p.id" :value="p.id">{{ p.shortName }}</option>
           <option :value="undefined">Добавить сотрудника</option>

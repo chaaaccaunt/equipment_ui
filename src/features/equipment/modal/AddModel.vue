@@ -3,33 +3,47 @@ import { useStore } from "@/entities";
 import { computed, onMounted, ref, watch } from "vue";
 import Loader from "@/share/components/Loader.vue";
 import AddBrand from "./AddBrand.vue";
+import AddType from "./AddType.vue";
 
 const store = useStore();
 const emits = defineEmits(["closeModal"]);
-const state = ref(false);
+const state = ref<null | "brand" | "type">(null);
 
 const loader = ref(false);
 const payload = ref({
   name: null as string | null,
   brandId: null as string | null,
+  typeId: null as string | null,
 });
 
 const existRecord = localStorage.getItem("new_model");
 
 if (existRecord) payload.value = JSON.parse(existRecord);
 
+const components = {
+  brand: AddBrand,
+  type: AddType,
+};
+
+const modals = computed(() => {
+  if (state.value === null) return;
+  return components[state.value];
+});
+
 const brandsList = computed(() => store.getters["brands/GET_LIST"] as Brands.Brand[]);
+const typeList = computed(() => store.getters["types/GET_LIST"] as iTypes.iType[]);
 
 function clear() {
   payload.value.name = null;
   payload.value.brandId = null;
+  payload.value.typeId = null;
 }
 
 function addCabinet() {
   loader.value = true;
   localStorage.setItem("new_model", JSON.stringify(payload.value));
   store
-    .dispatch("models/CREATE_MODEL", { name: payload.value.name, brandId: payload.value.brandId })
+    .dispatch("models/CREATE_MODEL", payload.value)
     .then(async () => {
       loader.value = false;
       localStorage.removeItem("new_model");
@@ -46,7 +60,9 @@ function addCabinet() {
 
 watch(payload.value, (newValue) => {
   if (typeof newValue.brandId === "undefined") {
-    state.value = true;
+    state.value = "brand";
+  } else if (typeof newValue.typeId === "undefined") {
+    state.value = "type";
   }
 });
 
@@ -55,7 +71,7 @@ function close() {
 }
 
 function closeSubModal() {
-  state.value = false;
+  state.value = null;
   payload.value.brandId = null;
 }
 
@@ -76,10 +92,10 @@ onMounted(async () => {
         </label>
       </p>
       <p>
-        <select v-model="payload.brandId">
-          <option :value="null" disabled>Выберите производителя</option>
-          <option v-for="p in brandsList" :key="p.id" :value="p.id">{{ p.name }}</option>
-          <option :value="undefined">Добавить производителя</option>
+        <select v-model="payload.typeId">
+          <option :value="null" disabled>Выберите тип оборудования</option>
+          <option v-for="p in typeList" :key="p.id" :value="p.id">{{ p.name }}</option>
+          <option :value="undefined">Добавить тип</option>
         </select>
       </p>
       <p>
@@ -96,7 +112,7 @@ onMounted(async () => {
       </div>
     </form>
     <div class="add-model__modal" v-if="state">
-      <AddBrand @close-modal="closeSubModal" />
+      <component :is="modals" @closeModal="closeSubModal"></component>
     </div>
   </div>
 </template>

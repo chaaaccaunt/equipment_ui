@@ -6,6 +6,7 @@ import { personal, iPersonalStore } from './modules/personal'
 import { messages, iMessagesStore } from './modules/messages'
 import { brands, iBrandsStore } from './modules/brands'
 import { models, iModelsStore } from './modules/models'
+import { iTypesStore, types } from './modules/types'
 
 export interface RootStore {
   equipments: iEquipmentStore
@@ -14,6 +15,7 @@ export interface RootStore {
   messages: iMessagesStore
   brands: iBrandsStore
   models: iModelsStore
+  types: iTypesStore
 }
 
 export const key: InjectionKey<Store<RootStore>> = Symbol()
@@ -25,7 +27,8 @@ export const store = createStore<RootStore>({
     personal,
     messages,
     brands,
-    models
+    models,
+    types
   }
 })
 

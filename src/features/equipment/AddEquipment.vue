@@ -10,6 +10,7 @@ import AddPerson from "./modal/AddPerson.vue";
 const store = useStore();
 const selectedModal = ref<"cabinet" | "model" | "person" | null>(null);
 const load = ref(true);
+const responsibility = ref(false);
 
 const personalList = computed(() => store.getters["personal/GET_LIST"] as Personal.Person[]);
 const cabinetList = computed(() => store.getters["cabinets/GET_LIST"] as Cabinets.Cabinet[]);
@@ -36,7 +37,7 @@ const payload = ref<Equipments.CreatePayload>({
 const rules = computed(() => ({
   cabinetId: { required: helpers.withMessage("Выберите кабинет", required), integer },
   modelId: { required: helpers.withMessage("Выберите модель оборудования", required), integer },
-  personalId: { required: helpers.withMessage("Выберите ответственного", required), integer },
+  personalId: {},
   inventoryNumber: {},
   serialNumber: {},
 }));
@@ -54,11 +55,13 @@ function create() {
       if (!valid) return;
       store
         .dispatch("equipments/CREATE_EQUIPMENT", payload.value)
-        .then(() => store.dispatch("equipments/GET_EQUIPMENT_LIST"))
+        .then(() => {
+          store.dispatch("equipments/GET_EQUIPMENT_LIST");
+          clear();
+        })
         .catch((error) => {
           store.dispatch("messages/PUSH_MESSAGE", { type: "error", message: error });
         });
-      clear();
     })
     .catch((error) => {
       store.dispatch("messages/PUSH_MESSAGE", { type: "error", message: error });
@@ -107,7 +110,7 @@ onMounted(async () => {
           <span v-else>&nbsp;</span>
         </p>
         <p>
-          <select v-model="payload.modelId">
+          <select v-model="payload.modelId" required>
             <option :value="null" disabled>Выберите оборудование</option>
             <option v-for="p in modelsList" :key="p.id" :value="p.id">{{ p.name }}</option>
             <option :value="undefined">Добавить оборудование</option>
@@ -116,22 +119,28 @@ onMounted(async () => {
           <span v-else>&nbsp;</span>
         </p>
         <p>
+          <input type="text" v-model="payload.serialNumber" />
+          <span v-if="v$.serialNumber.$error">{{ v$.serialNumber.errors[0] }}</span>
+          <span v-else>&nbsp;</span>
+        </p>
+        <p>
+          <input type="text" v-model="payload.inventoryNumber" pattern="[]{}" />
+          <span v-if="v$.inventoryNumber.error">{{ v$.inventoryNumber.errors[0] }}</span>
+          <span v-else>&nbsp;</span>
+        </p>
+        <p>
+          <label for="_responsibility"
+            >Назначить ответственного
+            <input type="checkbox" id="_responsibility" v-model="responsibility" />
+          </label>
+        </p>
+        <p v-if="responsibility">
           <select v-model="payload.personalId">
             <option :value="null" disabled>Выберите сотрудника</option>
             <option v-for="p in personalList" :key="p.id" :value="p.id">{{ p.shortName }}</option>
             <option :value="undefined">Добавить сотрудника</option>
           </select>
           <span v-if="v$.personalId.$errors.length">{{ v$.personalId.$errors[0].$message }}</span>
-          <span v-else>&nbsp;</span>
-        </p>
-        <p>
-          <input type="text" v-model="payload.serialNumber" />
-          <span v-if="v$.serialNumber.$error">{{ v$.serialNumber.errors[0] }}</span>
-          <span v-else>&nbsp;</span>
-        </p>
-        <p>
-          <input type="text" v-model="payload.inventoryNumber" />
-          <span v-if="v$.inventoryNumber.error">{{ v$.inventoryNumber.errors[0] }}</span>
           <span v-else>&nbsp;</span>
         </p>
       </div>

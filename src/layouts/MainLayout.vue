@@ -1,9 +1,24 @@
 <script lang="ts" setup>
+import { useStore } from "@/entities";
 import { ErrorRender } from "@/widgets";
+import { onMounted, ref } from "vue";
+
+const store = useStore();
+const loader = ref(false);
+
+onMounted(() => {
+  store
+    .dispatch("equipments/GET_EQUIPMENT_LIST")
+    .then(() => {
+      loader.value = true;
+    })
+    .catch((error) => {});
+});
 </script>
 
 <template>
-  <div class="container">
+  <Loader v-if="!loader"></Loader>
+  <div class="container" v-else>
     <header></header>
     <main class="main">
       <router-view />

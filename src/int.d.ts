@@ -64,6 +64,12 @@ declare global {
       name: string,
     }
   }
+  namespace iTypes {
+    interface iType {
+      id: number,
+      name: string
+    }
+  }
 }
 
 export { }
