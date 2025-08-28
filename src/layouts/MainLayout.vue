@@ -2,6 +2,7 @@
 import { useStore } from "@/entities";
 import { ErrorRender } from "@/widgets";
 import { onMounted, ref } from "vue";
+import { Navigation } from "@/widgets";
 
 const store = useStore();
 const loader = ref(false);
@@ -18,11 +19,15 @@ onMounted(() => {
 
 <template>
   <Loader v-if="!loader"></Loader>
+
   <div class="container" v-else>
     <header></header>
-    <main class="main">
-      <router-view />
-    </main>
+    <div class="container__content-wrp">
+      <Navigation />
+      <main class="main">
+        <router-view />
+      </main>
+    </div>
     <footer class="footer">
       <ErrorRender />
     </footer>
@@ -36,11 +41,16 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  &__content-wrp {
+    display: flex;
+    height: 100%;
+    flex-wrap: wrap;
+  }
 }
 .main {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  flex-grow: 1;
   height: 100%;
 }
 .footer {

@@ -11,6 +11,7 @@ const store = useStore();
 const selectedModal = ref<"cabinet" | "model" | "person" | null>(null);
 const load = ref(true);
 const responsibility = ref(false);
+const emits = defineEmits(["closeModal"]);
 
 const personalList = computed(() => store.getters["personal/GET_LIST"] as Personal.Person[]);
 const cabinetList = computed(() => store.getters["cabinets/GET_LIST"] as Cabinets.Cabinet[]);
@@ -87,6 +88,10 @@ watch(payload.value, (newValue) => {
   });
 });
 
+function close() {
+  emits("closeModal", "personalId");
+}
+
 onMounted(async () => {
   await store.dispatch("personal/GET_PERSON_LIST");
   await store.dispatch("cabinets/GET_CABINET_LIST");
@@ -99,6 +104,7 @@ onMounted(async () => {
   <Loader v-if="load"></Loader>
   <div class="equipment" v-else>
     <form @submit.prevent="create">
+      <h1>Добавление оборудования</h1>
       <div>
         <p>
           <select v-model="payload.cabinetId">
@@ -144,7 +150,11 @@ onMounted(async () => {
           <span v-else>&nbsp;</span>
         </p>
       </div>
-      <button type="submit">Добавить</button>
+      <div>
+        <button type="submit">Добавить</button>
+        <button @click="clear">Очистить</button>
+        <button @click="close">Закрыть</button>
+      </div>
     </form>
     <div class="equipment__modals" v-if="selectedModal">
       <component :is="modals" @closeModal="closeModal"></component>
@@ -156,7 +166,9 @@ onMounted(async () => {
 .equipment {
   position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   & form {
